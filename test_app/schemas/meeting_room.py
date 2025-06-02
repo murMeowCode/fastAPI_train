@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # Базовый класс схемы, от которого наследуем все остальные.
@@ -23,3 +23,11 @@ class MeetingRoomDB(MeetingRoomCreate):
 
     class Config:
         from_attributes = True
+
+class MeetingRoomUpdate(MeetingRoomBase):
+    
+    @field_validator('name')
+    def name_cannot_be_null(cls, value): #pylint: disable=E0213
+        if value is None:
+            raise ValueError('Имя переговорки не может быть пустым!')
+        return value
