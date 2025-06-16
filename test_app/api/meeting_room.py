@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from test_app.core.db import get_async_session
-from test_app.crud.meeting_room import create_meeting_room, get_meeting_room_by_id,get_room_id_by_name,read_all_rooms_from_db, update_meeting_room
+from test_app.crud.meeting_room import create_meeting_room, get_meeting_room_by_id,get_room_id_by_name,read_all_rooms_from_db, update_meeting_room,delete_meeting_room
 from test_app.schemas.meeting_room import MeetingRoomCreate, MeetingRoomDB, MeetingRoomUpdate
 
 router = APIRouter(prefix='/meeting_rooms')
@@ -30,6 +30,15 @@ async def partially_update_meeting_room(meeting_room_id : int, update_data : Mee
         await check_name_duplicate(update_data.name,session)
     room = await update_meeting_room(room,update_data,session)
     return room
+
+@router.delete('/{meeting_room_id}',response_model=MeetingRoomDB,response_model_exclude_none=True)
+async def remove_meeting_room(meeting_room_id : int, session : AsyncSession = Depends(get_async_session)):
+    room = await get_meeting_room_by_id(meeting_room_id,session)
+    if room is None:
+        raise HTTPException(status_code=404,
+                            detail="Переговорка не найдена!")
+    meeting_room = await delete_meeting_room(room,session)
+    return meeting_room    
 
 async def check_name_duplicate(room_name : str, session : AsyncSession) -> None:
     room_id = await get_room_id_by_name(room_name, session)
