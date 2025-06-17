@@ -5,7 +5,7 @@ from test_app.crud.meeting_room import meeting_room_crud
 from test_app.schemas.meeting_room import (MeetingRoomCreate,
                                            MeetingRoomDB, MeetingRoomUpdate)
 
-router = APIRouter(prefix='/meeting_rooms')
+router = APIRouter()
 
 
 @router.post('/',response_model=MeetingRoomDB,response_model_exclude_none=True)
