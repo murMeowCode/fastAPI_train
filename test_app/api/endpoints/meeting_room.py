@@ -4,6 +4,7 @@ from test_app.core.db import get_async_session
 from test_app.crud.meeting_room import meeting_room_crud
 from test_app.schemas.meeting_room import (MeetingRoomCreate,
                                            MeetingRoomDB, MeetingRoomUpdate)
+from test_app.api.validators import check_name_duplicate
 
 router = APIRouter()
 
@@ -39,12 +40,4 @@ async def remove_meeting_room(meeting_room_id : int, session : AsyncSession = De
         raise HTTPException(status_code=404,
                             detail="Переговорка не найдена!")
     meeting_room = await meeting_room_crud.remove(room,session)
-    return meeting_room    
-
-async def check_name_duplicate(room_name : str, session : AsyncSession) -> None:
-    room_id = await meeting_room_crud.get_room_id_by_name(room_name, session)
-    if room_id is not None:
-        raise HTTPException(
-            status_code=422,
-            detail='Переговорка с таким именем уже существует!',
-        )
+    return meeting_room
