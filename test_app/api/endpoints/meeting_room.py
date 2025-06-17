@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from test_app.core.db import get_async_session
 from test_app.crud.meeting_room import meeting_room_crud
-from test_app.models.meeting_room import MeetingRoom
 from test_app.schemas.meeting_room import (MeetingRoomCreate,
                                            MeetingRoomDB, MeetingRoomUpdate)
 
