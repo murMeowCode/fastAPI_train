@@ -1,6 +1,7 @@
 """CRUD operations for reservetion"""
 from datetime import datetime
 from typing import List
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from test_app.crud.base import CRUDBase
 from test_app.models.reservation import Reservation
@@ -27,7 +28,15 @@ class CRUDReservation(CRUDBase):
         Returns:
             List[Reservation]: _description_
         """
-
-        return []
+        rooms = await session.execute(
+            select(Reservation).where(
+                Reservation.meetingroom_id == meetingroom_id,
+                and_(
+                    from_reserve <= Reservation.to_reserve,
+                    to_reserve >= Reservation.from_reserve
+                ))
+        )
+        rooms = rooms.scalars.all()
+        return rooms
 
 reservation_crud = CRUDReservation(Reservation)
