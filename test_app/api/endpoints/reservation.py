@@ -1,15 +1,17 @@
 """"endpoints for reservations"""
+from typing import List
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from test_app.schemas.reservation import ReservationDB, ReservationCreate
 from test_app.core.db import get_async_session
 from test_app.crud.reservation import reservation_crud
 from test_app.api.validators import (
-    check_meeting_room_exists, check_reservation_interceptions)
+    check_meeting_room_exists, check_reservation_interceptions, check_reservation_before_edit)
 router = APIRouter()
 
 @router.post('/',response_model=ReservationDB,response_model_exclude_none=True)
 async def create_reservation(reservation : ReservationCreate,
-                             session = Depends(get_async_session)):
+                             session : AsyncSession = Depends(get_async_session)):
     """_summary_
 
     Args:
@@ -26,3 +28,18 @@ async def create_reservation(reservation : ReservationCreate,
         reservation,session)
 
     return new_reservation
+
+@router.get('/',response_model=List[ReservationDB])
+async def get_all_reservations(session : AsyncSession = Depends(get_async_session)):
+    reservations = reservation_crud.get_multi(session)
+    return await reservations
+
+@router.delete('/{reservation_id}',response_model=ReservationDB)
+async def delete_reservation(reservation_id : int,
+                             session : AsyncSession = Depends(get_async_session)):
+    reservation = await check_reservation_before_edit(
+        reservation_id=reservation_id,
+        session=session
+    )
+    reservation = reservation_crud.remove(reservation,session)
+    return reservation
