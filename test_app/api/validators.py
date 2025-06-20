@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from test_app.crud.meeting_room import meeting_room_crud
+from test_app.crud.reservation import reservation_crud
 from test_app.models.meeting_room import MeetingRoom
 
 async def check_name_duplicate(room_name : str, session : AsyncSession) -> None:
@@ -23,3 +24,15 @@ async def check_meeting_room_exists(
             detail='Переговорка не найдена!'
         )
     return meeting_room
+
+async def check_reservation_interceptions(**kwargs) -> None:
+    """_summary_
+    """
+    reservations = await reservation_crud.get_reservations_at_the_same_time(
+        **kwargs
+    )
+    if reservations:
+        raise HTTPException(
+            status_code=422,
+            detail=str(reservations)
+        )
