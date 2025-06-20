@@ -2,7 +2,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from test_app.schemas.reservation import ReservationDB, ReservationCreate
+from test_app.schemas.reservation import ReservationDB, ReservationCreate, ReservationUpdate
 from test_app.core.db import get_async_session
 from test_app.crud.reservation import reservation_crud
 from test_app.api.validators import (
@@ -42,4 +42,15 @@ async def delete_reservation(reservation_id : int,
         session=session
     )
     reservation = reservation_crud.remove(reservation,session)
+    return reservation
+
+@router.patch('/{reservation_id}',response_model=ReservationDB)
+async def update_reservation(reservation_id : int, obj_in : ReservationUpdate,
+                             session : AsyncSession = Depends(get_async_session)):
+    reservation = await check_reservation_before_edit(reservation_id,session)
+    await check_reservation_interceptions(**obj_in.model_dump,
+                                          reservation_id=reservation_id,
+                                          meetingroom_id = reservation.meetingroom_id,
+                                          session=session)
+    reservation = reservation_crud.update(db_obj=reservation,obj_in=obj_in,session=session)
     return reservation
