@@ -1,3 +1,4 @@
+"""module for main router creating combining less hierarchichal routers"""
 from fastapi import APIRouter
 
 from test_app.api.endpoints import room_router, reservation_router
