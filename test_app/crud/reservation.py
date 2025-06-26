@@ -13,7 +13,7 @@ class CRUDReservation(CRUDBase):
         CRUDBase (_type_): _description_
     """
 
-    async def get_reservations_at_the_same_time(self,*, from_reserve : datetime,
+    async def get_reservations_at_the_same_time(self,*, from_reserve : datetime, #pylint: disable=R0913
                                                 to_reserve : datetime,
                                                 meetingroom_id : int,
                                                 reservation_id : Optional[int] = None,
