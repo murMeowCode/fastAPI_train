@@ -6,7 +6,7 @@ from test_app.crud.reservation import reservation_crud
 from test_app.schemas.meeting_room import (MeetingRoomCreate,
                                            MeetingRoomDB, MeetingRoomUpdate)
 from test_app.schemas.reservation import ReservationDB
-from test_app.api.validators import check_name_duplicate
+from test_app.api.validators import check_meeting_room_exists, check_name_duplicate
 
 router = APIRouter()
 
@@ -37,18 +37,12 @@ async def partially_update_meeting_room(meeting_room_id : int, update_data : Mee
 
 @router.delete('/{meeting_room_id}',response_model=MeetingRoomDB,response_model_exclude_none=True)
 async def remove_meeting_room(meeting_room_id : int, session : AsyncSession = Depends(get_async_session)):
-    room = await meeting_room_crud.get(meeting_room_id,session)
-    if room is None:
-        raise HTTPException(status_code=404,
-                            detail="Переговорка не найдена!")
+    room = await check_meeting_room_exists(meeting_room_id,session)
     meeting_room = await meeting_room_crud.remove(room,session)
     return meeting_room
 
 @router.get('/{meetingroom_id}/reservations',response_model=ReservationDB)
 async def get_reservations_for_room(meetingroom_id : int, session : AsyncSession = Depends(get_async_session)):
-    room = await meeting_room_crud.get(meetingroom_id,session)
-    if room is None:
-        raise HTTPException(status_code=404,
-                            detail='Переговорка не найдена!')
+    await check_meeting_room_exists(meetingroom_id,session)
     reservations = await reservation_crud.get_future_reservations_for_room(meetingroom_id,session)
     return reservations
