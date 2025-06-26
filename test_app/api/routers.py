@@ -1,7 +1,7 @@
 """module for main router creating combining less hierarchichal routers"""
 from fastapi import APIRouter
 
-from test_app.api.endpoints import room_router, reservation_router
+from test_app.api.endpoints import room_router, reservation_router, user_router
 
 main_router = APIRouter()
 main_router.include_router(
@@ -10,3 +10,4 @@ main_router.include_router(
 main_router.include_router(
     reservation_router, prefix='/reservations', tags=['Reservations']
 )
+main_router.include_router(user_router)
