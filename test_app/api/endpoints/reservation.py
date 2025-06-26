@@ -31,12 +31,29 @@ async def create_reservation(reservation : ReservationCreate,
 
 @router.get('/',response_model=List[ReservationDB])
 async def get_all_reservations(session : AsyncSession = Depends(get_async_session)):
+    """_summary_
+
+    Args:
+        session (AsyncSession, optional): _description_. Defaults to Depends(get_async_session).
+
+    Returns:
+        _type_: _description_
+    """
     reservations = reservation_crud.get_multi(session)
     return await reservations
 
 @router.delete('/{reservation_id}',response_model=ReservationDB)
 async def delete_reservation(reservation_id : int,
                              session : AsyncSession = Depends(get_async_session)):
+    """_summary_
+
+    Args:
+        reservation_id (int): _description_
+        session (AsyncSession, optional): _description_. Defaults to Depends(get_async_session).
+
+    Returns:
+        _type_: _description_
+    """
     reservation = await check_reservation_before_edit(
         reservation_id=reservation_id,
         session=session
@@ -47,6 +64,16 @@ async def delete_reservation(reservation_id : int,
 @router.patch('/{reservation_id}',response_model=ReservationDB)
 async def update_reservation(reservation_id : int, obj_in : ReservationUpdate,
                              session : AsyncSession = Depends(get_async_session)):
+    """_summary_
+
+    Args:
+        reservation_id (int): _description_
+        obj_in (ReservationUpdate): _description_
+        session (AsyncSession, optional): _description_. Defaults to Depends(get_async_session).
+
+    Returns:
+        _type_: _description_
+    """
     reservation = await check_reservation_before_edit(reservation_id,session)
     await check_reservation_interceptions(**obj_in.model_dump,
                                           reservation_id=reservation_id,
