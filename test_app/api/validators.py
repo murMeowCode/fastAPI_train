@@ -28,7 +28,7 @@ async def check_meeting_room_exists(
 async def check_reservation_interceptions(**kwargs) -> None:
     """_summary_
     """
-    reservations = await reservation_crud.get_reservations_at_the_same_time(
+    reservations = await reservation_crud.get_reservations_at_the_same_time( #pylint: disable=E1125
         **kwargs
     )
     if reservations:

@@ -18,7 +18,7 @@ class ReservationUpdate(ReservationBase):
             raise ValueError("Время начала бронирования должно быть большего текущего")
         return value
 
-    @model_validator(skip_on_failure=True)
+    @model_validator(mode='after')
     def check_from_reserve_less_than_to_reserve(cls,values): #pylint: disable=E0213
         if values['from_reserve'] >= values['to_reserve']:
             raise ValueError("Время начала бронирования должно быть меньше времени окончания")
