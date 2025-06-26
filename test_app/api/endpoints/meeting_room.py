@@ -2,8 +2,10 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from test_app.core.db import get_async_session
 from test_app.crud.meeting_room import meeting_room_crud
+from test_app.crud.reservation import reservation_crud
 from test_app.schemas.meeting_room import (MeetingRoomCreate,
                                            MeetingRoomDB, MeetingRoomUpdate)
+from test_app.schemas.reservation import ReservationDB
 from test_app.api.validators import check_name_duplicate
 
 router = APIRouter()
@@ -41,3 +43,12 @@ async def remove_meeting_room(meeting_room_id : int, session : AsyncSession = De
                             detail="Переговорка не найдена!")
     meeting_room = await meeting_room_crud.remove(room,session)
     return meeting_room
+
+@router.get('/{meetingroom_id}/reservations',response_model=ReservationDB)
+async def get_reservations_for_room(meetingroom_id : int, session : AsyncSession = Depends(get_async_session)):
+    room = await meeting_room_crud.get(meetingroom_id,session)
+    if room is None:
+        raise HTTPException(status_code=404,
+                            detail='Переговорка не найдена!')
+    reservations = await reservation_crud.get_future_reservations_for_room(meetingroom_id,session)
+    return reservations
