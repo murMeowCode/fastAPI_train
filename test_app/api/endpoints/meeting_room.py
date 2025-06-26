@@ -42,7 +42,8 @@ async def get_all_meeting_rooms(session: AsyncSession = Depends(get_async_sessio
     rooms = await meeting_room_crud.get_multi(session)
     return rooms
 
-@router.patch('/{meeting_room_id}',response_model=MeetingRoomUpdate,response_model_exclude_none=True)
+@router.patch('/{meeting_room_id}',
+              response_model=MeetingRoomUpdate,response_model_exclude_none=True)
 async def partially_update_meeting_room(meeting_room_id : int, update_data : MeetingRoomUpdate,
                                         session : AsyncSession = Depends(get_async_session)):
     """_summary_
@@ -84,7 +85,8 @@ async def remove_meeting_room(meeting_room_id : int,
     return meeting_room
 
 @router.get('/{meetingroom_id}/reservations',response_model=list[ReservationDB])
-async def get_reservations_for_room(meetingroom_id : int, session : AsyncSession = Depends(get_async_session)):
+async def get_reservations_for_room(meetingroom_id : int,
+                                     session : AsyncSession = Depends(get_async_session)):
     """_summary_
 
     Args:
