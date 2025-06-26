@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     """
     app_title: str
     database_url: str
+    secret: str = "SECRET"
 
     class Config: # pylint: disable=C0115
         env_file = '.env'
