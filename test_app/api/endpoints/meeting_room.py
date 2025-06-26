@@ -41,7 +41,7 @@ async def remove_meeting_room(meeting_room_id : int, session : AsyncSession = De
     meeting_room = await meeting_room_crud.remove(room,session)
     return meeting_room
 
-@router.get('/{meetingroom_id}/reservations',response_model=ReservationDB)
+@router.get('/{meetingroom_id}/reservations',response_model=list[ReservationDB])
 async def get_reservations_for_room(meetingroom_id : int, session : AsyncSession = Depends(get_async_session)):
     await check_meeting_room_exists(meetingroom_id,session)
     reservations = await reservation_crud.get_future_reservations_for_room(meetingroom_id,session)

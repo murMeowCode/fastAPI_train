@@ -14,15 +14,17 @@ class ReservationUpdate(ReservationBase):
 
     @field_validator('from_reserve')
     def check_from_reserve_later_than_now(cls,value): #pylint: disable=E0213
+        if value.tzinfo is not None:  # Если есть часовой пояс
+            value = value.replace(tzinfo=None)  # Удаляем его
         if value <= datetime.now():
             raise ValueError("Время начала бронирования должно быть большего текущего")
         return value
 
     @model_validator(mode='after')
-    def check_from_reserve_less_than_to_reserve(cls,values): #pylint: disable=E0213
-        if values['from_reserve'] >= values['to_reserve']:
+    def check_from_reserve_less_than_to_reserve(self):  # Note: changed from cls to self
+        if self.from_reserve >= self.to_reserve:  # Access attributes directly
             raise ValueError("Время начала бронирования должно быть меньше времени окончания")
-        return values
+        return self
 
 class ReservationCreate(ReservationUpdate):
     meetingroom_id : int

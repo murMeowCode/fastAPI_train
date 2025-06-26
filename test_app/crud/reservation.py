@@ -40,10 +40,11 @@ class CRUDReservation(CRUDBase):
                 Reservation.id != reservation_id
             )
         rooms = await session.execute(select_smt)
-        rooms = rooms.scalars.all()
+        rooms = rooms.scalars().all()
         return rooms
 
-    async def get_future_reservations_for_room(self, room_id : int, session : AsyncSession):
+    async def get_future_reservations_for_room(self, room_id : int,
+                                                session : AsyncSession)-> List[Reservation]:
         """_summary_
 
         Args:
