@@ -26,7 +26,7 @@ class MeetingRoomCreate(MeetingRoomBase):
     name: str = Field(..., min_length=1, max_length=100)
     # Описывать поле description не нужно: оно уже есть в базовом классе.
 
-# Возвращаемую схему унаследуем от MeetingRoomCreate, 
+# Возвращаемую схему унаследуем от MeetingRoomCreate,
 # чтобы снова не описывать обязательное поле name.
 class MeetingRoomDB(MeetingRoomCreate):
     """_summary_

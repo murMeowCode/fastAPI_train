@@ -1,7 +1,8 @@
 """room_model"""
 from sqlalchemy import Column, String, Text
-from test_app.core.db import Base
 from sqlalchemy.orm import relationship
+from test_app.core.db import Base
+
 
 class MeetingRoom(Base):
     """_summary_
