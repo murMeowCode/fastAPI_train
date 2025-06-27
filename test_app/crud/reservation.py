@@ -61,4 +61,20 @@ class CRUDReservation(CRUDBase):
         future_reservations = future_reservations.scalars().all()
         return future_reservations
 
+    async def get_by_user(self,session : AsyncSession,user_id : int) -> List[Reservation]:
+        """_summary_
+
+        Args:
+            session (AsyncSession): _description_
+            user_id (int): _description_
+
+        Returns:
+            List[Reservation]: _description_
+        """
+        reservations = await session.execute(
+            select(Reservation).where(Reservation.user_id == user_id)
+        )
+        reservations = reservations.scalars().all()
+        return reservations
+
 reservation_crud = CRUDReservation(Reservation)

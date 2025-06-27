@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from test_app.crud.meeting_room import meeting_room_crud
 from test_app.crud.reservation import reservation_crud
 from test_app.models.meeting_room import MeetingRoom
+from test_app.models.user import User
 
 async def check_name_duplicate(room_name : str, session : AsyncSession) -> None:
     """_summary_
@@ -60,7 +61,7 @@ async def check_reservation_interceptions(**kwargs) -> None:
         )
 
 async def check_reservation_before_edit(reservation_id : int,
-                                         session : AsyncSession):
+                                         session : AsyncSession, user : User):
     """_summary_
 
     Args:
@@ -78,5 +79,10 @@ async def check_reservation_before_edit(reservation_id : int,
         raise HTTPException(
             status_code=404,
             detail='Бронь не найдена!'
+        )
+    if not (user.is_superuser or user.id == reservation.user_id):
+        raise HTTPException(
+            status_code=403,
+            detail='Только суперпользователи или владельцы могут изменять чужую запись!'
         )
     return reservation

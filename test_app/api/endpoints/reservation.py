@@ -47,7 +47,8 @@ async def get_all_reservations(session : AsyncSession = Depends(get_async_sessio
 
 @router.delete('/{reservation_id}',response_model=ReservationDB)
 async def delete_reservation(reservation_id : int,
-                             session : AsyncSession = Depends(get_async_session)):
+                             session : AsyncSession = Depends(get_async_session),
+                             user : User = Depends(current_user)):
     """_summary_
 
     Args:
@@ -59,14 +60,16 @@ async def delete_reservation(reservation_id : int,
     """
     reservation = await check_reservation_before_edit(
         reservation_id=reservation_id,
-        session=session
+        session=session,
+        user=user
     )
     reservation = reservation_crud.remove(reservation,session)
     return reservation
 
 @router.patch('/{reservation_id}',response_model=ReservationDB)
 async def update_reservation(reservation_id : int, obj_in : ReservationUpdate,
-                             session : AsyncSession = Depends(get_async_session)):
+                             session : AsyncSession = Depends(get_async_session),
+                             user : User = Depends(current_user)):
     """_summary_
 
     Args:
@@ -77,10 +80,27 @@ async def update_reservation(reservation_id : int, obj_in : ReservationUpdate,
     Returns:
         _type_: _description_
     """
-    reservation = await check_reservation_before_edit(reservation_id,session)
+    reservation = await check_reservation_before_edit(reservation_id,session,user)
     await check_reservation_interceptions(**obj_in.model_dump,
                                           reservation_id=reservation_id,
                                           meetingroom_id = reservation.meetingroom_id,
                                           session=session)
     reservation = reservation_crud.update(db_obj=reservation,obj_in=obj_in,session=session)
     return reservation
+
+@router.get('/my_reservations',response_model=list[ReservationDB],
+            response_model_exclude={'user_id'})
+async def get_my_reservations(session : AsyncSession = Depends(get_async_session),
+                              user : User = Depends(current_user)):
+    """_summary_
+
+    Args:
+        session (AsyncSession, optional): _description_. Defaults to Depends(get_async_session).
+        user (User, optional): _description_. Defaults to Depends(current_user).
+
+    Returns:
+        _type_: _description_
+    """
+    user_id = user.id
+    reservations = await reservation_crud.get_by_user(session,user_id)
+    return reservations
