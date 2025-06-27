@@ -1,5 +1,6 @@
 """schemas for reservations"""
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel,field_validator,model_validator
 
 
@@ -80,6 +81,7 @@ class ReservationDB(ReservationBase):
     """
     id : int
     meetingroom_id : int
+    user_id : Optional[int]
 
     class Config:
         """_summary_

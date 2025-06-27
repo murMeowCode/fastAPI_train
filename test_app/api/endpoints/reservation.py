@@ -2,8 +2,10 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from test_app.models import User
 from test_app.schemas.reservation import ReservationDB, ReservationCreate, ReservationUpdate
 from test_app.core.db import get_async_session
+from test_app.core.user import current_user
 from test_app.crud.reservation import reservation_crud
 from test_app.api.validators import (
     check_meeting_room_exists, check_reservation_interceptions, check_reservation_before_edit)
@@ -11,7 +13,8 @@ router = APIRouter()
 
 @router.post('/',response_model=ReservationDB,response_model_exclude_none=True)
 async def create_reservation(reservation : ReservationCreate,
-                             session : AsyncSession = Depends(get_async_session)):
+                             session : AsyncSession = Depends(get_async_session),
+                             user : User = Depends(current_user)):
     """_summary_
 
     Args:
@@ -25,7 +28,7 @@ async def create_reservation(reservation : ReservationCreate,
     await check_reservation_interceptions(**reservation.model_dump(),
                                           session=session)
     new_reservation = await reservation_crud.create(
-        reservation,session)
+        reservation,session,user)
 
     return new_reservation
 
